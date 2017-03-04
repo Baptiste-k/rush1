@@ -5,7 +5,7 @@
 ** Login   <baptiste.kissel@epitech.net>
 ** 
 ** Started on  Fri Mar  3 20:34:40 2017 Baptiste Kissel
-** Last update Sat Mar  4 16:26:01 2017 Baptiste Kissel
+** Last update Sat Mar  4 15:56:00 2017 Baptiste Kissel
 */
 
 #include <sys/types.h>
@@ -33,7 +33,6 @@ int	unarchive_it(int fd, char *name)
   content = malloc(sizeof(char) * length);
   read(fd, content, length);
   fprintf(file, "%s", content);
-  read(fd, content, 1);
   fclose(file);
   return (0);
 }
@@ -52,9 +51,8 @@ int	main(int ac, char **av)
     }
   if ((fd = open(av[1], O_RDONLY)) == -1)
     return (84);
-  while ((name = get_next_line(fd)) != NULL)
-    if (unarchive_it(fd, name) == 84)
-      return (84);
+  name = get_next_line(fd);
+  unarchive_it(fd, name);
   close(fd);
   return (0);
 }
