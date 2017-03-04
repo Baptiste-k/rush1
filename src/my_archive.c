@@ -5,7 +5,7 @@
 ** Login   <mathieu.bigare@epitech.eu@epitech.net>
 ** 
 ** Started on  Fri Mar  3 20:48:01 2017 
-** Last update Sat Mar  4 18:59:16 2017 
+** Last update Sat Mar  4 19:19:55 2017 
 */
 
 #include "my.h"
@@ -18,6 +18,30 @@
 #include <unistd.h>
 #include <string.h>
 #include <dirent.h>
+
+char    *bigger(char *str, char *src)
+{
+  int   i;
+  int   j;
+  char  *new_buff;
+
+  i = 0;
+  j = 0;
+  if ((new_buff = malloc(strlen(str) + strlen(src) + 1)) == NULL)
+    return (NULL);
+  new_buff[strlen(str) + strlen(src) + 1] = '\0';
+  while (str[i] != '\0')
+    {
+      new_buff[j] = str[i];
+      i++;
+      j++;
+    }
+  i = 0;
+  while (i < strlen(src))
+    new_buff[j++] = src[i++];
+  return (new_buff);
+}
+
 
 int		write_data(char *cfile, struct stat buf, char *name, FILE *file_archive)
 {
@@ -57,13 +81,12 @@ int		fill_archive_dir(DIR *dir, FILE *file_archive, char *cfile, int fd_archive)
   struct dirent	*dirent;
   struct stat	buf;
   int		fd;
+  char		*name;
 
+  if (cfile[strlen(cfile) - 1] != '/')
+    cfile = bigger(cfile, "/");
   while ((dirent = readdir(dir)) != NULL)
     {
-      if (cfile[strlen(cfile) - 1] != '/')
-	cfile = strcat(cfile, "/");
-      printf("NAME %s\n", dirent->d_name);
-      printf("CFILE %s\n", cfile);
       if ((strcmp(dirent->d_name, ".") != 0) && (strcmp(dirent->d_name, "..") != 0))
 	{
 	  stat(my_strcat(cfile, dirent->d_name), &buf);
