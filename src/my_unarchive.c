@@ -5,7 +5,7 @@
 ** Login   <baptiste.kissel@epitech.net>
 ** 
 ** Started on  Fri Mar  3 20:34:40 2017 Baptiste Kissel
-** Last update Sat Mar  4 16:26:01 2017 Baptiste Kissel
+** Last update Sat Mar  4 18:10:19 2017 Baptiste Kissel
 */
 
 #include <sys/types.h>
@@ -15,7 +15,33 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <dirent.h>
 #include "get_next_line.h"
+
+int	check_folder(char *str)
+{
+  int	i;
+  int	j;
+  char	*tmp;
+
+  i = -1;
+  j = 0;
+  tmp = malloc(sizeof(char) * strlen(str));
+  while (str[++i] != '\0')
+    {
+      if (str[i] == '/' && str[i + 1] != '/')
+	{
+	  if (opendir(tmp) == NULL)
+	    mkdir(tmp, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+	  tmp = malloc(sizeof(char) * strlen(str));
+	  j = 0;
+	}
+      else
+	tmp[j] = str[i];
+      j++;
+    }
+  return (0);
+}
 
 int	unarchive_it(int fd, char *name)
 {
@@ -53,8 +79,11 @@ int	main(int ac, char **av)
   if ((fd = open(av[1], O_RDONLY)) == -1)
     return (84);
   while ((name = get_next_line(fd)) != NULL)
-    if (unarchive_it(fd, name) == 84)
-      return (84);
+    {
+      check_folder(name);
+      if (unarchive_it(fd, name) == 84)
+	return (84);
+    }
   close(fd);
   return (0);
 }
