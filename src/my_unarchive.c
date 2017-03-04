@@ -5,7 +5,7 @@
 ** Login   <baptiste.kissel@epitech.net>
 ** 
 ** Started on  Fri Mar  3 20:34:40 2017 Baptiste Kissel
-** Last update Sat Mar  4 13:03:57 2017 Baptiste Kissel
+** Last update Sat Mar  4 13:53:12 2017 
 */
 
 #include <sys/types.h>
@@ -30,53 +30,48 @@ char	*fix_title(char *str)
   return (tmp);
 }
 
-int	unarchive_it(FILE *fd, char *name)
+int	unarchive_it(FILE *file, char *name)
 {
-  char		*length;
-  char		*str;
+  int		length;
+  char		*tmp;
+  char		*content;
   size_t	size;
-  FILE		*fd2;
+  FILE		*file2;
 
-  str = malloc(sizeof(char));
-  length = malloc(sizeof(char));
-  if (getline(&length, &size, fd) == -1)
+  size = 0;
+  file2 = fopen(name, "+w");
+  if (getline(&tmp, &size, file) == -1)
     return (84);
-  fread(str, atoi(length), 1, fd);
-  getline(&length, &size, fd);
-  fd2 = fopen(name, "w");
-  fputs(str, fd2);
-  fclose(fd2);
-  if (getline(&name, &size, fd) != -1)
-    {
-      name = fix_title(name);
-      unarchive_it(fd, name);
-    }
+  length = atoi(tmp);
+  read(file, content, length);
+  fputs(content, file2);
+  fclose(file2);
   return (0);
 }
 
 int	main(int ac, char **av)
 {
-  FILE		*fd;
+  FILE		*file;
   char		*name;
   size_t	size;
   int		i;
 
-  name = malloc(sizeof(char)); 
   i = 1;
+  size = 0;
   if (ac == 1)
     {
       printf("Usage: ./my_unarchive [archive_name]\n");
       return (0);
     }
+  if ((file = fopen(av[i], "r")) == NULL)
+    return (84);
   while (i < ac)
     {
-      if ((fd = fopen(av[i], "r")) == NULL)
-	return (84);
-      getline(&name, &size, fd);
+      getline(&name, &size, file);
       name = fix_title(name);
-      unarchive_it(fd, name);
-      fclose(fd);
+      unarchive_it(file, name);
       i++;
     }
+  fclose(file);
   return (0);
 }
