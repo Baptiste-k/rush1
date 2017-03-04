@@ -5,7 +5,7 @@
 ** Login   <baptiste.kissel@epitech.net>
 ** 
 ** Started on  Fri Mar  3 20:34:40 2017 Baptiste Kissel
-** Last update Sat Mar  4 13:57:39 2017 
+** Last update Sat Mar  4 15:56:00 2017 Baptiste Kissel
 */
 
 #include <sys/types.h>
@@ -15,20 +15,7 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <unistd.h>
-
-char	*fix_title(char *str)
-{
-  int	i;
-  int	size;
-  char	*tmp;
-
-  i = -1;
-  size = strlen(str) - 1;
-  tmp = malloc(sizeof(char) * size);
-  while (++i < size)
-    tmp[i] = str[i];
-  return (tmp);
-}
+#include "get_next_line.h"
 
 int	unarchive_it(int fd, char *name)
 {
@@ -39,13 +26,14 @@ int	unarchive_it(int fd, char *name)
   FILE		*file;
 
   size = 0;
-  file2 = fopen(name, "+w");
-  if (getline(&tmp, &size, file) == -1)
+  file = fopen(name, "w+");
+  if ((tmp = get_next_line(fd)) == NULL)
     return (84);
   length = atoi(tmp);
-  read(file, content, length);
-  fputs(content, file2);
-  fclose(file2);
+  content = malloc(sizeof(char) * length);
+  read(fd, content, length);
+  fprintf(file, "%s", content);
+  fclose(file);
   return (0);
 }
 
@@ -63,9 +51,8 @@ int	main(int ac, char **av)
     }
   if ((fd = open(av[1], O_RDONLY)) == -1)
     return (84);
-  getline(&name, &size, file);
-  name = fix_title(name);
-  unarchive_it(file, name);
+  name = get_next_line(fd);
+  unarchive_it(fd, name);
   close(fd);
   return (0);
 }
