@@ -1,3 +1,4 @@
 void	my_putchar(char c)
 {
-  writ
+  write(1, &c, 1);
+}

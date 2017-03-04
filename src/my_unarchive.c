@@ -5,7 +5,7 @@
 ** Login   <baptiste.kissel@epitech.net>
 ** 
 ** Started on  Fri Mar  3 20:34:40 2017 Baptiste Kissel
-** Last update Sat Mar  4 13:53:12 2017 
+** Last update Sat Mar  4 15:56:00 2017 Baptiste Kissel
 */
 
 #include <sys/types.h>
@@ -15,63 +15,44 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include "get_next_line.h"
 
-char	*fix_title(char *str)
-{
-  int	i;
-  int	size;
-  char	*tmp;
-
-  i = -1;
-  size = strlen(str) - 1;
-  tmp = malloc(sizeof(char) * size);
-  while (++i < size)
-    tmp[i] = str[i];
-  return (tmp);
-}
-
-int	unarchive_it(FILE *file, char *name)
+int	unarchive_it(int fd, char *name)
 {
   int		length;
   char		*tmp;
   char		*content;
   size_t	size;
-  FILE		*file2;
+  FILE		*file;
 
   size = 0;
-  file2 = fopen(name, "+w");
-  if (getline(&tmp, &size, file) == -1)
+  file = fopen(name, "w+");
+  if ((tmp = get_next_line(fd)) == NULL)
     return (84);
   length = atoi(tmp);
-  read(file, content, length);
-  fputs(content, file2);
-  fclose(file2);
+  content = malloc(sizeof(char) * length);
+  read(fd, content, length);
+  fprintf(file, "%s", content);
+  fclose(file);
   return (0);
 }
 
 int	main(int ac, char **av)
 {
-  FILE		*file;
   char		*name;
   size_t	size;
-  int		i;
+  int		fd;
 
-  i = 1;
   size = 0;
   if (ac == 1)
     {
       printf("Usage: ./my_unarchive [archive_name]\n");
       return (0);
     }
-  if ((file = fopen(av[i], "r")) == NULL)
+  if ((fd = open(av[1], O_RDONLY)) == -1)
     return (84);
-  while (i < ac)
-    {
-      getline(&name, &size, file);
-      name = fix_title(name);
-      unarchive_it(file, name);
-      i++;
-    }
-  fclose(file);
+  name = get_next_line(fd);
+  unarchive_it(fd, name);
+  close(fd);
   return (0);
 }
