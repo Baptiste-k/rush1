@@ -5,7 +5,7 @@
 ** Login   <baptiste.kissel@epitech.net>
 ** 
 ** Started on  Fri Mar  3 20:34:40 2017 Baptiste Kissel
-** Last update Sat Mar  4 18:10:19 2017 Baptiste Kissel
+** Last update Sun Mar  5 14:42:32 2017 Baptiste Kissel
 */
 
 #include <sys/types.h>
@@ -21,24 +21,21 @@
 int	check_folder(char *str)
 {
   int	i;
-  int	j;
   char	*tmp;
 
-  i = -1;
-  j = 0;
-  tmp = malloc(sizeof(char) * strlen(str));
-  while (str[++i] != '\0')
+  i = 0;
+  tmp = malloc(sizeof(char) * (strlen(str) + 1));
+  tmp = memset(tmp, 0, strlen(str));
+  tmp[strlen(str)] = '\0';
+  while (str[i] != '\0' && i <= strlen(str))
     {
-      if (str[i] == '/' && str[i + 1] != '/')
+      if (str[i] == '/')
 	{
 	  if (opendir(tmp) == NULL)
 	    mkdir(tmp, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-	  tmp = malloc(sizeof(char) * strlen(str));
-	  j = 0;
 	}
-      else
-	tmp[j] = str[i];
-      j++;
+      tmp[i] = str[i];
+      i++;
     }
   return (0);
 }
@@ -67,10 +64,10 @@ int	unarchive_it(int fd, char *name)
 int	main(int ac, char **av)
 {
   char		*name;
-  size_t	size;
+  /* size_t	size; */
   int		fd;
 
-  size = 0;
+  //  size = 0;
   if (ac == 1)
     {
       printf("Usage: ./my_unarchive [archive_name]\n");
